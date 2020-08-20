@@ -44,6 +44,10 @@ java {
     withSourcesJar()
 }
 
+kotlin {
+    explicitApi()
+}
+
 compileKotlin {
     kotlinOptions {
         jvmTarget = "1.6"

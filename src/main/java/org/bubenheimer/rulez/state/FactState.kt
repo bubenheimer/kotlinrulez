@@ -24,14 +24,14 @@ import org.bubenheimer.rulez.rules.FactVector
  * @param state The initial state
  * @param changeListener Called whenever a potential state change occurs.
  */
-class FactState(
+public class FactState(
     state: State = State.VOID,
     private val changeListener: ChangeListener? = null
 ) {
     /**
      * The current semantic state
      */
-    var state: State = state
+    public var state: State = state
         private set
 
     /**
@@ -55,7 +55,7 @@ class FactState(
  * Called whenever a potential state change occurs. The function parameters
  * are the old state, added facts, removed facts, and new state, in this order.
  */
-typealias ChangeListener = (
+public typealias ChangeListener = (
     oldState: State,
     removedFacts: FactVector,
     addedFacts: FactVector,

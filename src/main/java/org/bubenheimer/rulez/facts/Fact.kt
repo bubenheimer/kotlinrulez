@@ -17,6 +17,7 @@
 package org.bubenheimer.rulez.facts
 
 import org.bubenheimer.rulez.rules.Conjunction
+import org.bubenheimer.rulez.rules.FactVector
 import org.bubenheimer.rulez.rules.toVector
 
 /**
@@ -24,34 +25,34 @@ import org.bubenheimer.rulez.rules.toVector
  *
  * @param factBase scope of [Fact] for [id] allocation
  */
-open class Fact constructor(factBase: FactBase) : Conjunction {
+public open class Fact constructor(factBase: FactBase) : Conjunction {
     /**
      * The internal fact id, valid within a given [FactBase]. All facts in a [FactBase]
      * have distinct IDs.
      */
-    val id: Int = factBase.allocateFactId()
+    public val id: Int = factBase.allocateFactId()
 
     /**
      * Fact mask generated from [id].
      */
-    val mask: FactMask = toMask()
+    public val mask: FactMask = toMask()
 
     /**
      * A fact is a [Conjunction] with a single conjunct.
      */
-    final override val conjuncts get() = listOf(this)
+    final override val conjuncts: Iterable<Fact> get() = listOf(this)
 
     /**
      * Just makes it final as there is no good reason for further overrides.
      */
-    final override val disjuncts get() = super.disjuncts
+    final override val disjuncts: Iterable<Conjunction> get() = super.disjuncts
 
     /**
      * Combine this fact with [fact] into a [org.bubenheimer.rulez.rules.FactVector]
      */
-    operator fun plus(fact: Fact) = toVector() + fact
+    public operator fun plus(fact: Fact): FactVector = toVector() + fact
 
-    override fun toString() = "Fact $id"
+    override fun toString(): String = "Fact $id"
 }
 
 /**
@@ -59,4 +60,4 @@ open class Fact constructor(factBase: FactBase) : Conjunction {
  *
  * @receiver scope of [Fact] for [Fact.id] allocation
  */
-fun FactBase.newFact() = Fact(this)
+public fun FactBase.newFact(): Fact = Fact(this)

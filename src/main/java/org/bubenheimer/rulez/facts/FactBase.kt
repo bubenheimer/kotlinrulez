@@ -21,7 +21,7 @@ import java.util.concurrent.atomic.AtomicInteger
 /**
  * Fact tracker tied to a specific rule base
  */
-class FactBase {
+public class FactBase {
     /**
      * The current number of generated [Fact]s. Bounded by [MAX_FACTS].
      */
@@ -37,10 +37,10 @@ class FactBase {
         if (MAX_FACTS <= it) throw IndexOutOfBoundsException("Too many facts")
     }
 
-    companion object {
+    public companion object {
         /**
          * The maximum number of [Fact]s
          */
-        const val MAX_FACTS = UInt.SIZE_BITS
+        public const val MAX_FACTS: Int = UInt.SIZE_BITS
     }
 }

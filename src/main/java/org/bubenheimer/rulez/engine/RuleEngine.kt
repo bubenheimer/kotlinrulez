@@ -28,7 +28,7 @@ import org.bubenheimer.rulez.state.State
  * @param evalStalledHandler called if evaluation stalls; may throw [EvalStalledException]
  *
  */
-abstract class RuleEngine(
+public abstract class RuleEngine(
     protected val factState: FactState,
     rules: Iterable<Rule>,
     private val evalStalledHandler: EvalStalledHandler? = null
@@ -51,11 +51,11 @@ abstract class RuleEngine(
  * May be thrown by user code when evaluation has moved into a stalled state.
  * This will generally terminate rule engine operations.
  */
-class EvalStalledException(message: String? = null) : Exception(message)
+public class EvalStalledException(message: String? = null) : Exception(message)
 
 /**
  * Listener invoked when rule evaluation stalls
  *
  * @throws EvalStalledException to terminate evaluation with an error
  */
-typealias EvalStalledHandler = (state: State) -> Unit
+public typealias EvalStalledHandler = (state: State) -> Unit

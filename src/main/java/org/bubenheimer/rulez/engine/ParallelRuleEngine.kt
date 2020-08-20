@@ -47,7 +47,7 @@ import kotlin.coroutines.coroutineContext
  * [Boolean] is `false` when called at the beginning of an eval, and `true` at the end.
  * @param evalLogger called with log output at various points during evaluation
  */
-open class ParallelRuleEngine(
+public open class ParallelRuleEngine(
     factState: FactState,
     rules: Iterable<Rule>,
     evalStalledHandler: EvalStalledHandler? = null,
@@ -147,7 +147,7 @@ open class ParallelRuleEngine(
      *        }
      *    )
      */
-    suspend fun applyExternalFacts(actionResult: ActionResult) {
+    public suspend fun applyExternalFacts(actionResult: ActionResult) {
         channel.send(IndexedResult(actionResult, null))
     }
 
@@ -176,7 +176,7 @@ open class ParallelRuleEngine(
      * @throws EvalStalledException when evaluation has stalled
      */
     @Throws(EvalStalledException::class)
-    suspend fun evaluate() = try {
+    public suspend fun evaluate(): Unit = try {
         // Synthesize a CoroutineScope from the current coroutineContext, and provide as a receiver;
         // this does not create a new Job, it just makes a CoroutineScope available
         // to functions that need one without risking having different scope & context when passing
@@ -281,11 +281,11 @@ open class ParallelRuleEngine(
  *
  * @param state the current fact [State]
  */
-typealias EvalIterationListener = (state: State) -> Unit
+public typealias EvalIterationListener = (state: State) -> Unit
 
 /**
  * Called at various points during evaluation to log debug messages
  *
  * @param message a debug message [String] to be printed
  */
-typealias EvalLogger = (message: String) -> Unit
+public typealias EvalLogger = (message: String) -> Unit

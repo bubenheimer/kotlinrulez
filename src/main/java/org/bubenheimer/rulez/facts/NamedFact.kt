@@ -22,8 +22,8 @@ package org.bubenheimer.rulez.facts
  * @param factBase scope of [NamedFact] for [NamedFact.id] allocation
  * @param name the fact name
  */
-open class NamedFact(factBase: FactBase, val name: String) : Fact(factBase) {
-    override fun toString() = "$id: $name"
+public open class NamedFact(factBase: FactBase, public val name: String) : Fact(factBase) {
+    override fun toString(): String = "$id: $name"
 }
 
 /**
@@ -32,4 +32,4 @@ open class NamedFact(factBase: FactBase, val name: String) : Fact(factBase) {
  * @receiver scope of [NamedFact] for [NamedFact.id] allocation
  * @param name a fact name
  */
-fun FactBase.newFact(name: String) = NamedFact(this, name)
+public fun FactBase.newFact(name: String): NamedFact = NamedFact(this, name)

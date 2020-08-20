@@ -24,7 +24,7 @@ import org.bubenheimer.rulez.rules.toVector
 /**
  * Rule engine fact state
  */
-inline class State constructor(val value: UInt) {
+public inline class State constructor(public val value: UInt) {
     /**
      * Convenience method to format the fact state of the rule engine or the rule base
      * evaluation state as a string in a standard manner (a reversed bit vector string).
@@ -41,47 +41,48 @@ inline class State constructor(val value: UInt) {
     /**
      * Logical/bitwise `and`
      */
-    infix fun and(factVector: FactVector) = State(value and factVector.value)
+    public infix fun and(factVector: FactVector): State = State(value and factVector.value)
 
     /**
      * Logical/bitwise `or`
      */
-    operator fun plus(factVector: FactVector) = State(value or factVector.value)
+    public operator fun plus(factVector: FactVector): State = State(value or factVector.value)
 
     /**
      * Removes [Fact]s in [factVector] from current state.
      */
-    operator fun minus(factVector: FactVector) = State(value and factVector.value.inv())
+    public operator fun minus(factVector: FactVector): State =
+        State(value and factVector.value.inv())
 
     /**
      * Returns `true` iff [fact] is valid in current state.
      */
     @Suppress("unused")
-    operator fun contains(fact: Fact) = value and fact.mask.value != VOID.value
+    public operator fun contains(fact: Fact): Boolean = value and fact.mask.value != VOID.value
 
     /**
      * Returns value of [fact] in current state.
      */
     @Suppress("unused")
-    operator fun get(fact: Fact) = contains(fact)
+    public operator fun get(fact: Fact): Boolean = contains(fact)
 
     /**
      * Overrides the present value of [fact] with [value]
      */
     @Suppress("unused")
-    operator fun invoke(fact: Fact, value: Boolean) =
+    public operator fun invoke(fact: Fact, value: Boolean): State =
         fact.toVector().let { if (value) plus(it) else minus(it) }
 
     /**
      * State weight is the number of valid [Fact]s
      */
     @ExperimentalStdlibApi
-    fun weight() = value.countOneBits()
+    public fun weight(): Int = value.countOneBits()
 
-    companion object {
+    public companion object {
         /**
          * State with no valid [Fact]s
          */
-        val VOID = State(0u)
+        public val VOID: State = State(0u)
     }
 }
