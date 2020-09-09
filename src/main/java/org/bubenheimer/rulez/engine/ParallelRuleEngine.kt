@@ -231,10 +231,26 @@ public open class ParallelRuleEngine(
             }
         }
 
+        // Cycle initialization order - here is the idea, but it causes plenty of implementation
+        // overhead as is:
+        //
+        // return ((lastCompletedRuleIndex + 1 until rules.size) + (0..lastCompletedRuleIndex))
+        //     .count { matchRule(it) }
+        //
+        // Instead, as an optimization, use 2 distinct ranges and basic for loops to avoid Iterable,
+        // etc.
 
-        // Cycle initialization order with 2 distinct ranges to avoid union overhead
-        return (lastCompletedRuleIndex + 1 until rules.size).count { matchRule(it) } +
-                (0..lastCompletedRuleIndex).count { matchRule(it) }
+        var rulesInProgress = 0
+
+        for (i in lastCompletedRuleIndex + 1 until rules.size) {
+            if (matchRule(i)) ++rulesInProgress
+        }
+
+        for (i in 0..lastCompletedRuleIndex) {
+            if (matchRule(i)) ++rulesInProgress
+        }
+
+        return rulesInProgress
     }
 
     /**
