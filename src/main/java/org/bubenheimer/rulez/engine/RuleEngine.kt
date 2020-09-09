@@ -40,6 +40,8 @@ public abstract class RuleEngine(
 
     /**
      * To be called by subclasses when evaluation has moved into a stalled state.
+     *
+     * @throws EvalStalledException to terminate evaluation with an error
      */
     @Throws(EvalStalledException::class)
     protected fun handleEvaluationStall() {
@@ -54,8 +56,17 @@ public abstract class RuleEngine(
 public class EvalStalledException(message: String? = null) : Exception(message)
 
 /**
- * Listener invoked when rule evaluation stalls
+ * Called when rule evaluation stalls.
  *
- * @throws EvalStalledException to terminate evaluation with an error
+ * This is a functional interface rather than a typealias primarily as an optimization to avoid
+ * boxing upon invocation.
  */
-public typealias EvalStalledHandler = (state: State) -> Unit
+public fun interface EvalStalledHandler {
+    /**
+     * @param state the current fact [State]
+     *
+     * @throws EvalStalledException to terminate evaluation with an error
+     */
+    @Throws(EvalStalledException::class)
+    public fun invoke(state: State)
+}

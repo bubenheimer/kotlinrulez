@@ -302,11 +302,17 @@ public open class ParallelRuleEngine(
 }
 
 /**
- * Called at the beginning of each evaluation iteration
+ * Called at the beginning of each evaluation iteration.
  *
- * @param state the current fact [State]
+ * This is a functional interface rather than a typealias primarily as an optimization to avoid
+ * boxing upon invocation.
  */
-public typealias EvalIterationListener = (state: State) -> Unit
+public fun interface EvalIterationListener {
+    /**
+     * @param state the current fact [State]
+     */
+    public fun invoke(state: State)
+}
 
 /**
  * Called at various points during evaluation to log debug messages
