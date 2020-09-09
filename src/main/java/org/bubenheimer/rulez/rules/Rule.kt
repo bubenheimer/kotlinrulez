@@ -27,14 +27,18 @@ import kotlin.coroutines.EmptyCoroutineContext
  */
 public interface Rule {
     /**
-     *  A disjunction of conjunctions that must hold to let the rule fire
+     *  A disjunction of conjunctions that must hold to let the rule fire;
+     *  this is a [List] rather than an [Iterable] as an optimization to permit more performant
+     *  iteration
      */
-    public val conditions: Iterable<FactVector>
+    public val conditions: List<FactVector>
 
     /**
-     * A disjunction of conjunctions that must not hold to let the rule fire
+     * A disjunction of conjunctions that must not hold to let the rule fire;
+     *  this is a [List] rather than an [Iterable] as an optimization to permit more performant
+     *  iteration
      */
-    public val negConditions: Iterable<FactVector>
+    public val negConditions: List<FactVector>
 
     /**
      * The rule action to execute when the rule fires
@@ -47,8 +51,22 @@ public interface Rule {
      * @return whether the left-hand side matches the fact state
      */
     //TODO optimization possible for the common case of disjoint negated conditions
-    public fun eval(state: State): Boolean =
-        conditions.all(state::matches) && !negConditions.any(state::matches)
+    @Suppress("ReplaceManualRangeWithIndicesCalls")
+    public fun eval(state: State): Boolean {
+        // This is the idea, but we optimize with boring code to avoid overhead
+        //
+        // return conditions.all(state::matches) && !negConditions.any(state::matches)
+
+        for (i in 0 until conditions.size) {
+            if (!state.matches(conditions[i])) return false
+        }
+
+        for (i in 0 until negConditions.size) {
+            if (state.matches(negConditions[i])) return false
+        }
+
+        return true
+    }
 }
 
 /**
@@ -254,7 +272,7 @@ private class Propo(
  * @param action the rule action to execute when the rule fires
  */
 private class BaseRule(
-    override val conditions: Iterable<FactVector>,
-    override val negConditions: Iterable<FactVector>,
+    override val conditions: List<FactVector>,
+    override val negConditions: List<FactVector>,
     override val action: RuleAction
 ) : Rule
