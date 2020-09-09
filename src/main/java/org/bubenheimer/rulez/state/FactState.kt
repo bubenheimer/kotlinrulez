@@ -52,12 +52,22 @@ public class FactState(
 }
 
 /**
- * Called whenever a potential state change occurs. The function parameters
- * are the old state, added facts, removed facts, and new state, in this order.
+ * Called whenever a potential state change occurs.
+ *
+ * This is a functional interface rather than a typealias primarily as an optimization to avoid
+ * boxing upon invocation.
  */
-public typealias ChangeListener = (
-    oldState: State,
-    removedFacts: FactVector,
-    addedFacts: FactVector,
-    newState: State
-) -> Unit
+public fun interface ChangeListener {
+    /**
+     * @param oldState      old state
+     * @param removedFacts  removed facts
+     * @param addedFacts    added facts
+     * @param newState      new state
+     */
+    public fun invoke(
+        oldState: State,
+        removedFacts: FactVector,
+        addedFacts: FactVector,
+        newState: State
+    )
+}

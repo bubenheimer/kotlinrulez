@@ -45,7 +45,8 @@ import kotlin.coroutines.coroutineContext
  * at the end of each evaluation iteration; the end state may not be the same as the next
  * iteration's begin state as other coroutines may add and remove facts in-between. The passed
  * [Boolean] is `false` when called at the beginning of an eval, and `true` at the end.
- * @param evalLogger called with log output at various points during evaluation
+ * @param evalLogger Called with log output at various points during evaluation. The logger should
+ * not be set for performance-critical code as generating log output incurs significant overhead.
  */
 public open class ParallelRuleEngine(
     factState: FactState,
