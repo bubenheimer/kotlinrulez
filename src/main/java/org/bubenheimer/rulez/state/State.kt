@@ -36,7 +36,7 @@ public inline class State constructor(public val value: UInt) {
      * Returns `true` iff fact state contains all [Fact]s in [factVector].
      */
     internal fun matches(factVector: FactVector): Boolean =
-        value and factVector.value == factVector.value
+        (value and factVector.value) == factVector.value
 
     /**
      * Logical/bitwise `and`
