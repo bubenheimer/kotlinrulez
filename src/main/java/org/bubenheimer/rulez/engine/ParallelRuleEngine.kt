@@ -212,25 +212,6 @@ public open class ParallelRuleEngine(
      * @return the current number of rule actions in progress
      */
     private fun CoroutineScope.matchRules(): Int {
-        fun matchRule(ruleIndex: Int): Boolean = rulesState[ruleIndex].takeIf { it }?.also {
-            evalLogger?.invoke("Rule ${ruleIndex + 1} running: ${rules[ruleIndex]}")
-        } ?: run {
-            val rule = rules[ruleIndex]
-            if (rule.eval(factState.state)) {
-                evalLogger?.invoke("Rule ${ruleIndex + 1} firing: $rule")
-                val ruleAction = rule.action
-                launch(
-                    context = ruleAction.context,
-                    start = CoroutineStart.DEFAULT,
-                    block = { actionWrapper(ruleIndex, ruleAction.block) }
-                )
-                rulesState[ruleIndex] = true
-                true
-            } else {
-                false
-            }
-        }
-
         // Cycle initialization order - here is the idea, but it causes plenty of implementation
         // overhead as is:
         //
@@ -252,6 +233,34 @@ public open class ParallelRuleEngine(
 
         return rulesInProgress
     }
+
+    /**
+     * Evaluates rule against the current knowledge base state.
+     * If successfully matched, fires rule action as new coroutine.
+     *
+     * This could be an internal function to [matchRules], but is not as an optimization.
+     *
+     * @return `true` iff match successful
+     */
+    private fun CoroutineScope.matchRule(ruleIndex: Int): Boolean =
+        rulesState[ruleIndex].takeIf { it }?.also {
+            evalLogger?.invoke("Rule ${ruleIndex + 1} running: ${rules[ruleIndex]}")
+        } ?: run {
+            val rule = rules[ruleIndex]
+            if (rule.eval(factState.state)) {
+                evalLogger?.invoke("Rule ${ruleIndex + 1} firing: $rule")
+                val ruleAction = rule.action
+                launch(
+                    context = ruleAction.context,
+                    start = CoroutineStart.DEFAULT,
+                    block = { actionWrapper(ruleIndex, ruleAction.block) }
+                )
+                rulesState[ruleIndex] = true
+                true
+            } else {
+                false
+            }
+        }
 
     /**
      * Consumes results from rule action execution.
