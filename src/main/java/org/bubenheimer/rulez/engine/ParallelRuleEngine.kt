@@ -23,6 +23,9 @@ import org.bubenheimer.rulez.rules.Rule
 import org.bubenheimer.rulez.state.FactState
 import org.bubenheimer.rulez.state.State
 import java.util.*
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
 import kotlin.coroutines.coroutineContext
 
 /**
@@ -48,6 +51,7 @@ import kotlin.coroutines.coroutineContext
  * @param evalLogger Called with log output at various points during evaluation. The logger should
  * not be set for performance-critical code as generating log output incurs significant overhead.
  */
+@ExperimentalContracts
 public open class ParallelRuleEngine(
     factState: FactState,
     rules: Iterable<Rule>,
@@ -85,6 +89,8 @@ public open class ParallelRuleEngine(
         @Suppress("REDUNDANT_INLINE_SUSPEND_FUNCTION_TYPE") // nonsense warning
         block: suspend CoroutineScope.() -> ActionResult
     ) {
+        contract { callsInPlace(block, InvocationKind.EXACTLY_ONCE) }
+
         try {
             val actionResult = block()
             channel.send(IndexedResult(actionResult, ruleIndex))
