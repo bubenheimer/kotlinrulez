@@ -61,12 +61,11 @@ public open class ParallelRuleEngine(
 ) : RuleEngine(factState, rules, evalStalledHandler) {
     /**
      * Internal result from rule action combined with the rule's index for recordkeeping.
-     *
-     * @param result result from rule action; this can be either an [ActionResult] or a [Throwable]
-     * if the rule action failed or was cancelled.
      */
-    // The Result class in Kotlin 1.3.72 is too unwieldy to use
-    private class IndexedResult(val result: Any, val ruleIndex: Int?)
+    private sealed class IndexedResult(val ruleIndex: Int?) {
+        internal class Success(val result: ActionResult, ruleIndex: Int?) : IndexedResult(ruleIndex)
+        internal class Failure(val t: Throwable, ruleIndex: Int) : IndexedResult(ruleIndex)
+    }
 
     /**
      * The evaluation state of all rules. A rule with a currently executing action is `true`,
@@ -93,10 +92,10 @@ public open class ParallelRuleEngine(
 
         try {
             val actionResult = block()
-            channel.send(IndexedResult(actionResult, ruleIndex))
+            channel.send(IndexedResult.Success(actionResult, ruleIndex))
         } catch (t: Throwable) {
             withContext(NonCancellable) {
-                channel.send(IndexedResult(t, ruleIndex))
+                channel.send(IndexedResult.Failure(t, ruleIndex))
             }
             // Re-throw to ensure standard handling of cancellations and errors
             throw t
@@ -151,7 +150,7 @@ public open class ParallelRuleEngine(
      *    )
      */
     public suspend fun applyExternalFacts(actionResult: ActionResult) {
-        channel.send(IndexedResult(actionResult, null))
+        channel.send(IndexedResult.Success(actionResult, null))
     }
 
     /**
@@ -280,25 +279,30 @@ public open class ParallelRuleEngine(
                 lastCompletedRuleIndex = ruleIndex
                 rulesState[ruleIndex] = false
             }
-            val result = indexedResult.result
-            if (result is Throwable) {
-                evalLogger?.invoke(
-                    "Rule ${ruleIndex!! + 1} (\"${rules[ruleIndex]}\")" +
-                            " terminated with error: $result"
-                )
-            } else {
-                check(result is ActionResult)
-                if (ruleIndex == null) {
-                    evalLogger?.invoke("Applying external state change: $result")
-                } else {
-                    evalLogger
-                        ?.invoke("Applying rule ${lastCompletedRuleIndex + 1} result: $result")
+
+            when (indexedResult) {
+                is IndexedResult.Failure -> {
+                    evalLogger?.invoke(
+                        "Rule ${ruleIndex!! + 1} (\"${rules[ruleIndex]}\")" +
+                                " terminated with error: ${indexedResult.t}"
+                    )
                 }
-                factState.removeAddFacts(
-                    remove = result.removeVector,
-                    add = result.addVector
-                )
+
+                is IndexedResult.Success -> {
+                    val result = indexedResult.result
+                    if (ruleIndex == null) {
+                        evalLogger?.invoke("Applying external state change: $result")
+                    } else {
+                        evalLogger
+                            ?.invoke("Applying rule ${lastCompletedRuleIndex + 1} result: $result")
+                    }
+                    factState.removeAddFacts(
+                        remove = result.removeVector,
+                        add = result.addVector
+                    )
+                }
             }
+
             indexedResult = channel.poll()
         } while (indexedResult != null)
     }
