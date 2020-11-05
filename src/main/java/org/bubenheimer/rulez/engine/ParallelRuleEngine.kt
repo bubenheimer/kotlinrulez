@@ -95,17 +95,13 @@ public open class ParallelRuleEngine(
             val actionResult = block()
             channel.send(IndexedResult(actionResult, ruleIndex))
         } catch (t: Throwable) {
-            sendNonCancellable(t, ruleIndex)
+            withContext(NonCancellable) {
+                channel.send(IndexedResult(t, ruleIndex))
+            }
             // Re-throw to ensure standard handling of cancellations and errors
             throw t
         }
     }
-
-    // Workaround for https://github.com/Kotlin/kotlinx.coroutines/issues/2041
-    private suspend fun sendNonCancellable(t: Throwable, ruleIndex: Int) =
-        withContext(NonCancellable) {
-            channel.send(IndexedResult(t, ruleIndex))
-        }
 
     /**
      * Tracks the most recently completed rule to shift the evaluation bias in a predictable
