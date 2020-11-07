@@ -62,9 +62,13 @@ public open class ParallelRuleEngine(
     /**
      * Internal result from rule action combined with the rule's index for recordkeeping.
      */
-    private sealed class IndexedResult(val ruleIndex: Int?) {
-        internal class Success(val result: ActionResult, ruleIndex: Int?) : IndexedResult(ruleIndex)
-        internal class Failure(val t: Throwable, ruleIndex: Int) : IndexedResult(ruleIndex)
+    private sealed class IndexedResult {
+        abstract val ruleIndex: Int?
+
+        internal class Success(val result: ActionResult, override val ruleIndex: Int?) :
+            IndexedResult()
+
+        internal class Failure(val t: Throwable, override val ruleIndex: Int) : IndexedResult()
     }
 
     /**
