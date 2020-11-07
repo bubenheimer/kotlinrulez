@@ -55,6 +55,7 @@ compileKotlin {
                 "-progressive",
                 "-Xinline-classes",
                 "-Xjvm-default=all",
+                "-Xopt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
                 "-Xopt-in=kotlin.ExperimentalUnsignedTypes"
         ]
     }

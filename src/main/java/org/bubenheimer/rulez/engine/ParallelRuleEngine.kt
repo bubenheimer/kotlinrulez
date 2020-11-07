@@ -274,41 +274,33 @@ public open class ParallelRuleEngine(
     private suspend fun consumeResults() {
         //TODO optimization: check if the factState actually changed
 
-        var indexedResult: IndexedResult? = channel.receive()
-
-        // loop never suspends, but it won't take long
+        // loop never suspends while channel is not empty, but it won't take long
         do {
-            val ruleIndex = indexedResult!!.ruleIndex
-            if (ruleIndex != null) {
-                lastCompletedRuleIndex = ruleIndex
-                rulesState[ruleIndex] = false
-            }
-
-            when (indexedResult) {
-                is IndexedResult.Failure -> {
-                    evalLogger?.invoke(
-                        "Rule ${ruleIndex!! + 1} (\"${rules[ruleIndex]}\")" +
-                                " terminated with error: ${indexedResult.t}"
-                    )
+            channel.receive().apply {
+                ruleIndex?.let {
+                    lastCompletedRuleIndex = it
+                    rulesState[it] = false
                 }
 
-                is IndexedResult.Success -> {
-                    val result = indexedResult.result
-                    if (ruleIndex == null) {
-                        evalLogger?.invoke("Applying external state change: $result")
-                    } else {
-                        evalLogger
-                            ?.invoke("Applying rule ${lastCompletedRuleIndex + 1} result: $result")
+                when (this) {
+                    is IndexedResult.Failure -> evalLogger?.invoke(
+                        "Rule ${ruleIndex + 1} (\"${rules[ruleIndex]}\") terminated with error: $t"
+                    )
+
+                    is IndexedResult.Success -> {
+                        evalLogger?.invoke(ruleIndex?.let {
+                            "Applying rule ${it + 1} result: $result"
+                        } ?: "Applying external state change: $result"
+                        )
+
+                        factState.removeAddFacts(
+                            remove = result.removeVector,
+                            add = result.addVector
+                        )
                     }
-                    factState.removeAddFacts(
-                        remove = result.removeVector,
-                        add = result.addVector
-                    )
                 }
             }
-
-            indexedResult = channel.poll()
-        } while (indexedResult != null)
+        } while (!channel.isEmpty)
     }
 }
 
