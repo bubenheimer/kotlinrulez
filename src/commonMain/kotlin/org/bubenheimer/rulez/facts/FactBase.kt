@@ -16,7 +16,7 @@
  */
 package org.bubenheimer.rulez.facts
 
-import java.util.concurrent.atomic.AtomicInteger
+import org.bubenheimer.util.AtomicInt
 
 /**
  * Fact tracker tied to a specific rule base
@@ -25,7 +25,7 @@ public class FactBase {
     /**
      * The current number of generated [Fact]s. Bounded by [MAX_FACTS].
      */
-    private var factCount = AtomicInteger()
+    private var factCount = AtomicInt(0)
 
     /**
      * Allocates a new [Fact.id]
@@ -33,7 +33,7 @@ public class FactBase {
      * @throws IndexOutOfBoundsException when the number of facts exceeds [MAX_FACTS]
      */
     @Throws(IndexOutOfBoundsException::class)
-    internal fun allocateFactId() = factCount.getAndIncrement().also {
+    internal fun allocateFactId() = (factCount.addAndGet(1) - 1).also {
         if (MAX_FACTS <= it) throw IndexOutOfBoundsException("Too many facts")
     }
 

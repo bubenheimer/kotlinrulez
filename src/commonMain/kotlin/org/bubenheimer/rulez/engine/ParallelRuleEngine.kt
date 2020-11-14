@@ -22,7 +22,7 @@ import org.bubenheimer.rulez.rules.ActionResult
 import org.bubenheimer.rulez.rules.Rule
 import org.bubenheimer.rulez.state.FactState
 import org.bubenheimer.rulez.state.State
-import java.util.*
+import org.bubenheimer.util.BitSet
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract

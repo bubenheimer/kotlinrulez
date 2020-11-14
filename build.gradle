@@ -21,10 +21,11 @@ buildscript {
     repositories {
         gradlePluginPortal()
     }
+}
 
-    dependencies {
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-    }
+plugins {
+    id("maven-publish")
+    id("org.jetbrains.kotlin.multiplatform") version("$kotlin_version")
 }
 
 repositories {
@@ -32,45 +33,58 @@ repositories {
     jcenter()
 }
 
-apply plugin: 'java-library'
-apply plugin: 'kotlin'
-apply plugin: 'maven-publish'
-
-group = 'org.bubenheimer'
-version = '1.0-SNAPSHOT'
-
-java {
-    withJavadocJar()
-    withSourcesJar()
-}
-
 kotlin {
-    explicitApi()
-}
+    sourceSets {
+        all {
+            languageSettings {
+                progressiveMode = true
+                enableLanguageFeature('InlineClasses')
+                useExperimentalAnnotation("kotlin.ExperimentalUnsignedTypes")
+                useExperimentalAnnotation("kotlinx.coroutines.ExperimentalCoroutinesApi")
+            }
+        }
 
-compileKotlin {
-    kotlinOptions {
-        jvmTarget = "1.8"
-        freeCompilerArgs = [
-                "-progressive",
-                "-Xinline-classes",
-                "-Xjvm-default=all",
-                "-Xopt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
-                "-Xopt-in=kotlin.ExperimentalUnsignedTypes"
-        ]
+        commonMain {
+            dependencies {
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.1")
+                implementation("org.bubenheimer:kotlinutil:1.0-SNAPSHOT")
+            }
+        }
     }
-}
 
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            from components.java
+    targets {
+        all {
+            compilations {
+                all {
+                    kotlinOptions {
+                        verbose = true
+                    }
+                }
+
+                main {
+                    explicitApi()
+                }
+            }
+        }
+    }
+
+    jvm() {
+        compilations {
+            all {
+                kotlinOptions {
+                    jvmTarget = "1.8"
+                    freeCompilerArgs = [
+                            "-Xjvm-default=all"
+                    ]
+                }
+
+                dependencies {
+                    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version")
+                }
+            }
         }
     }
 }
 
-dependencies {
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.1")
-
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version")
-}
+group = 'org.bubenheimer'
+version = '1.0-SNAPSHOT'
