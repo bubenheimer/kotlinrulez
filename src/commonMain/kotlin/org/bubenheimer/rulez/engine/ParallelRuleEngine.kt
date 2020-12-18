@@ -197,12 +197,10 @@ public open class ParallelRuleEngine(
                     handleEvaluationStall()
                 }
 
-                // Delay for a minimal amount to effect potentially more
-                // reliable operation on Android with Schedulers.Main.immediate and maybe
-                // other challenging environments and schedulers when some rule is
-                // misbehaving.
-                // https://issuetracker.google.com/issues/163170948
-                delay(1L)
+                // Yield() to other coroutines for more reliable operation when some rule is
+                // misbehaving with Schedulers.Main.immediate or other challenging schedulers and
+                // environments
+                yield()
 
                 consumeResults()
             }
