@@ -186,7 +186,7 @@ public open class ParallelRuleEngine(
         // Synthesize a CoroutineScope from the current coroutineContext, and provide as a receiver;
         // this does not create a new Job, it just makes a CoroutineScope available
         // to functions that need one without risking having different scope & context when passing
-        // in a scope to suspending function
+        // scope to a suspending function
         CoroutineScope(coroutineContext).run {
             // rule engine evaluation loop; terminates if coroutine got cancelled
             while (isActive) {
@@ -198,7 +198,7 @@ public open class ParallelRuleEngine(
                 }
 
                 // Yield() to other coroutines for more reliable operation when some rule is
-                // misbehaving with Schedulers.Main.immediate or other challenging schedulers and
+                // misbehaving with Dispatchers.Main.immediate or other challenging dispatchers and
                 // environments
                 yield()
 
