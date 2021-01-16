@@ -16,7 +16,7 @@
  */
 
 buildscript {
-    ext.kotlin_version = '1.4.20'
+    ext.kotlin_version = '1.4.21'
 
     repositories {
         gradlePluginPortal()
@@ -76,10 +76,6 @@ kotlin {
                     freeCompilerArgs = [
                             "-Xjvm-default=all"
                     ]
-                }
-
-                dependencies {
-                    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version")
                 }
             }
         }
