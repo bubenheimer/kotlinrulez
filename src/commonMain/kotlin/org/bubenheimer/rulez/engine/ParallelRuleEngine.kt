@@ -26,6 +26,7 @@ import org.bubenheimer.util.BitSet
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
+import kotlin.coroutines.cancellation.CancellationException
 import kotlin.coroutines.coroutineContext
 
 /**
@@ -181,7 +182,7 @@ public open class ParallelRuleEngine(
      *
      * @throws EvalStalledException when evaluation has stalled
      */
-    @Throws(EvalStalledException::class)
+    @Throws(EvalStalledException::class, CancellationException::class)
     public suspend fun evaluate(): Unit = try {
         // Synthesize a CoroutineScope from the current coroutineContext, and provide as a receiver;
         // this does not create a new Job, it just makes a CoroutineScope available
