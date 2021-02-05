@@ -72,7 +72,6 @@ public interface Rule {
 /**
  * Result of rule action.
  */
-@Suppress("NON_PUBLIC_PRIMARY_CONSTRUCTOR_OF_INLINE_CLASS")
 public inline class ActionResult internal constructor(private val value: ULong) {
     /**
      * Empty result. Prefer to use [VOID] constant instead.

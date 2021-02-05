@@ -24,7 +24,6 @@ import org.bubenheimer.rulez.facts.Fact
  *
  * @param value a bit vector of [Fact]s, generated via the associated [toVector] methods
  */
-@Suppress("NON_PUBLIC_PRIMARY_CONSTRUCTOR_OF_INLINE_CLASS")
 public inline class FactVector internal constructor(internal val value: UInt) {
     override fun toString(): String = value.toString(2)
 
