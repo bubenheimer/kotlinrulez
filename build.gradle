@@ -21,12 +21,18 @@ buildscript {
     repositories {
         gradlePluginPortal()
     }
+
+    dependencies {
+        classpath "org.jetbrains.kotlinx:atomicfu-gradle-plugin:0.15.1"
+    }
 }
 
 plugins {
     id("maven-publish")
     id("org.jetbrains.kotlin.multiplatform") version("$kotlin_version")
 }
+
+apply plugin: "kotlinx-atomicfu"
 
 repositories {
     mavenLocal()

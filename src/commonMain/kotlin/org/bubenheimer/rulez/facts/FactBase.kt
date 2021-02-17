@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2020 Uli Bubenheimer
+ * Copyright (c) 2015-2021 Uli Bubenheimer
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
  */
 package org.bubenheimer.rulez.facts
 
-import org.bubenheimer.util.AtomicInt
+import kotlinx.atomicfu.atomic
 
 /**
  * Fact tracker tied to a specific rule base
@@ -25,7 +25,7 @@ public class FactBase {
     /**
      * The current number of generated [Fact]s. Bounded by [MAX_FACTS].
      */
-    private var factCount = AtomicInt(0)
+    private val factCount = atomic(0)
 
     /**
      * Allocates a new [Fact.id]
@@ -33,7 +33,7 @@ public class FactBase {
      * @throws IndexOutOfBoundsException when the number of facts exceeds [MAX_FACTS]
      */
     @Throws(IndexOutOfBoundsException::class)
-    internal fun allocateFactId() = (factCount.addAndGet(1) - 1).also {
+    internal fun allocateFactId() = (factCount.getAndIncrement()).also {
         if (MAX_FACTS <= it) throw IndexOutOfBoundsException("Too many facts")
     }
 
