@@ -132,13 +132,15 @@ public open class ParallelRuleEngine(
      *    NamedRule("Show onboarding dialog",
      *        givenNot(onboardingDialogShown or onboardingDialogShowing) then action {
      *            OnboardingDialogFragment().showNow(
-     *            childFragmentManager, TAG_FRAGMENT_ONBOARDING_DIALOG
+     *                childFragmentManager, TAG_FRAGMENT_ONBOARDING_DIALOG
      *            )
      *            ActionResult(add = onboardingDialogShowing)
      *            // The Dialog operates on its own outside the engine from here on; we tie things
      *            // back to the engine by calling the following once the dialog is dismissed:
-     *            // ParallelRuleEngine.applyExternalFacts(ActionResult(
-     *            //     remove = onboardingDialogShowing, add = onboardingDialogShown))
+     *            // ParallelRuleEngine.applyExternalFacts(
+     *            //     ActionResult(
+     *            //         remove = onboardingDialogShowing, add = onboardingDialogShown)
+     *            //     )
      *        }
      *    )
      *
