@@ -27,7 +27,6 @@ import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 import kotlin.coroutines.cancellation.CancellationException
-import kotlin.coroutines.coroutineContext
 
 /**
  * A rule engine where conceptually the evaluation strategy checks for each rule whether its
@@ -79,8 +78,8 @@ public open class ParallelRuleEngine(
     private val rulesState = BitSet(rules.count())
 
     /**
-     * Receives successful and failed results from rule action execution. The default channel buffer
-     * size is virtually guaranteed to ensure fully buffered operation.
+     * Receives successful and failed results from rule action execution. The specified channel
+     * buffer size is virtually guaranteed to ensure non-suspending operation.
      */
     private val channel = Channel<IndexedResult>(rules.count())
 
@@ -184,11 +183,8 @@ public open class ParallelRuleEngine(
      */
     @Throws(EvalStalledException::class, CancellationException::class)
     public suspend fun evaluate(): Unit = try {
-        // Synthesize a CoroutineScope from the current coroutineContext, and provide as a receiver;
-        // this does not create a new Job, it just makes a CoroutineScope available
-        // to functions that need one without risking having different scope & context when passing
-        // scope to a suspending function
-        CoroutineScope(coroutineContext).run {
+        // Make a CoroutineScope available for creating new coroutines
+        coroutineScope {
             // rule engine evaluation loop; terminates if coroutine got cancelled
             while (isActive) {
                 evalIterationListener?.invoke(factState.state)
@@ -198,7 +194,7 @@ public open class ParallelRuleEngine(
                     handleEvaluationStall()
                 }
 
-                // Yield() to other coroutines for more reliable operation when some rule is
+                // yield() to other coroutines for more reliable operation when some rule is
                 // misbehaving with Dispatchers.Main.immediate or other challenging dispatchers and
                 // environments
                 yield()
