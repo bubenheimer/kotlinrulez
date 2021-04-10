@@ -17,6 +17,7 @@
 package org.bubenheimer.rulez.rules
 
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CoroutineStart
 import org.bubenheimer.rulez.facts.Fact
 import org.bubenheimer.rulez.state.State
 import kotlin.coroutines.CoroutineContext
@@ -124,6 +125,12 @@ public interface RuleAction {
     public val context: CoroutineContext
 
     /**
+     * Start option for coroutine builder. Some options, in particular [CoroutineStart.LAZY], may
+     * not be valid, and cause runtime errors or undefined behavior.
+     */
+    public val started: CoroutineStart
+
+    /**
      * Rule action coroutine. The CoroutineScope receiver contains the merged context and the new
      * `Job`.
      */
@@ -140,6 +147,13 @@ public fun RuleAction(
      * CoroutineContext and a fresh `Job`.
      */
     context: CoroutineContext = EmptyCoroutineContext,
+
+    /**
+     * Start option for coroutine builder. Some options, in particular [CoroutineStart.LAZY], may
+     * not be valid, and cause runtime errors or undefined behavior.
+     */
+    started: CoroutineStart = CoroutineStart.DEFAULT,
+
     /**
      * Rule action coroutine. The CoroutineScope receiver contains the merged context and the new
      * `Job`.
@@ -147,6 +161,7 @@ public fun RuleAction(
     block: suspend CoroutineScope.() -> ActionResult
 ): RuleAction = object : RuleAction {
     override val context = context
+    override val started = started
     override val block = block
 }
 

@@ -20,6 +20,7 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import org.bubenheimer.rulez.rules.ActionResult
 import org.bubenheimer.rulez.rules.Rule
+import org.bubenheimer.rulez.rules.RuleAction
 import org.bubenheimer.rulez.state.FactState
 import org.bubenheimer.rulez.state.State
 import org.bubenheimer.util.BitSet
@@ -42,6 +43,7 @@ import kotlin.coroutines.cancellation.CancellationException
  *
  * @param factState The initial fact state
  * @param rules The rules. Rules are copied for use in the rule engine.
+ * [RuleAction.started] cannot be [CoroutineStart.LAZY].
  * @param evalStalledHandler Called with the final [State] once evaluation ends due to a stable fact
  * state
  * @param evalIterationListener Called with the new [State] at the beginning and
@@ -59,6 +61,14 @@ public open class ParallelRuleEngine(
     private val evalIterationListener: EvalIterationListener? = null,
     private val evalLogger: EvalLogger? = null
 ) : RuleEngine(factState, rules, evalStalledHandler) {
+    init {
+        rules.forEach {
+            require(it.action.started != CoroutineStart.LAZY) {
+                "Rule.action.started cannot be CoroutineStart.LAZY"
+            }
+        }
+    }
+
     /**
      * Internal result from rule action combined with the rule's index for recordkeeping.
      */
@@ -255,7 +265,9 @@ public open class ParallelRuleEngine(
             if (rule.eval(factState.state)) {
                 evalLogger?.invoke("Rule ${ruleIndex + 1} firing: $rule")
                 val ruleAction = rule.action
-                launch(ruleAction.context) { actionWrapper(ruleIndex, ruleAction.block) }
+                launch(ruleAction.context, ruleAction.started) {
+                    actionWrapper(ruleIndex, ruleAction.block)
+                }
                 rulesState[ruleIndex] = true
                 true
             } else {
