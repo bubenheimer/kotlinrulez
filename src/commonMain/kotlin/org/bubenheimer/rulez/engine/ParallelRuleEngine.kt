@@ -268,11 +268,11 @@ public open class ParallelRuleEngine(
             val rule = rules[ruleIndex]
             if (rule.eval(factState.state)) {
                 evalLogger?.invoke("Rule ${ruleIndex + 1} firing: $rule")
+                rulesState[ruleIndex] = true
                 val ruleAction = rule.action
                 launch(ruleAction.context, ruleAction.started) {
                     actionWrapper(ruleIndex, ruleAction.block)
                 }
-                rulesState[ruleIndex] = true
                 true
             } else {
                 false
