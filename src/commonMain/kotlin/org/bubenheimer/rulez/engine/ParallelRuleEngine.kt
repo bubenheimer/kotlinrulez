@@ -121,7 +121,9 @@ public open class ParallelRuleEngine(
      *
      *    NamedRule("Show onboarding dialog",
      *        givenNot(onboardingDialogShown or onboardingDialogShowing) then action {
-     *            OnboardingDialogFragment().showNow(childFragmentManager, TAG_FRAGMENT_ONBOARDING_DIALOG)
+     *            OnboardingDialogFragment().showNow(
+     *            childFragmentManager, TAG_FRAGMENT_ONBOARDING_DIALOG
+     *            )
      *            ActionResult(add = onboardingDialogShowing)
      *            // The Dialog operates on its own outside the engine from here on; we tie things
      *            // back to the engine by calling the following once the dialog is dismissed:
@@ -139,7 +141,9 @@ public open class ParallelRuleEngine(
      *
      *    NamedRule("Show onboarding dialog",
      *        givenNot(onboardingDialogShown or onboardingDialogShowing) then action {
-     *            OnboardingDialogFragment().showNow(childFragmentManager, TAG_FRAGMENT_ONBOARDING_DIALOG)
+     *            OnboardingDialogFragment().showNow(
+     *                childFragmentManager, TAG_FRAGMENT_ONBOARDING_DIALOG
+     *            )
      *            ActionResult(add = onboardingDialogShowing)
      *            // The Dialog operates on its own outside this engine from here on; we tie things
      *            // back to the engine with a CompletableJob in the rule below
@@ -251,11 +255,7 @@ public open class ParallelRuleEngine(
             if (rule.eval(factState.state)) {
                 evalLogger?.invoke("Rule ${ruleIndex + 1} firing: $rule")
                 val ruleAction = rule.action
-                launch(
-                    context = ruleAction.context,
-                    start = CoroutineStart.DEFAULT,
-                    block = { actionWrapper(ruleIndex, ruleAction.block) }
-                )
+                launch(ruleAction.context) { actionWrapper(ruleIndex, ruleAction.block) }
                 rulesState[ruleIndex] = true
                 true
             } else {
@@ -269,7 +269,8 @@ public open class ParallelRuleEngine(
     private suspend fun consumeResults() {
         //TODO optimization: check if the factState actually changed
 
-        // loop never suspends while channel is not empty, but it won't take long
+        // loop never suspends while channel is not empty, but purging channel and processing
+        // contents is swift
         do {
             channel.receive().apply {
                 ruleIndex?.let {
