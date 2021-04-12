@@ -166,12 +166,13 @@ public fun RuleAction(
 }
 
 /**
- * A named rule
+ * Create a rule with a name from a base rule.
  *
  * @param name the rule name for debugging
- * @param rule the base rule
+ * @receiver the base rule
+ * @return new named rule
  */
-public open class NamedRule(public val name: String, private val rule: Rule) : Rule by rule {
+public fun Rule.name(name: String): Rule = object : Rule by this {
     override fun toString(): String = name
 }
 

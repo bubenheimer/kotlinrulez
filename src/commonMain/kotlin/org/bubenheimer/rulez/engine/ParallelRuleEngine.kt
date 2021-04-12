@@ -19,7 +19,6 @@ package org.bubenheimer.rulez.engine
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import org.bubenheimer.rulez.rules.ActionResult
-import org.bubenheimer.rulez.rules.NamedRule
 import org.bubenheimer.rulez.rules.Rule
 import org.bubenheimer.rulez.rules.RuleAction
 import org.bubenheimer.rulez.state.FactState
@@ -65,8 +64,7 @@ public open class ParallelRuleEngine(
     init {
         rules.forEach {
             require(it.action.started != CoroutineStart.LAZY) {
-                ((it as? NamedRule)?.let { it.name + ": " } ?: "") +
-                        "Rule.action.started cannot be CoroutineStart.LAZY"
+                "$it: Rule.action.started cannot be CoroutineStart.LAZY"
             }
         }
     }
