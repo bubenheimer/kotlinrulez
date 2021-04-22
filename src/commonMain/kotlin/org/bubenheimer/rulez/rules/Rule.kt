@@ -22,6 +22,7 @@ import org.bubenheimer.rulez.facts.Fact
 import org.bubenheimer.rulez.state.State
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
+import kotlin.jvm.JvmInline
 
 /**
  * A rule
@@ -73,7 +74,8 @@ public interface Rule {
 /**
  * Result of rule action.
  */
-public inline class ActionResult internal constructor(private val value: ULong) {
+@JvmInline
+public value class ActionResult internal constructor(private val value: ULong) {
     /**
      * Empty result. Prefer to use [VOID] constant instead.
      */

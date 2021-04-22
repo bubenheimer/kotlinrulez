@@ -18,13 +18,15 @@
 package org.bubenheimer.rulez.rules
 
 import org.bubenheimer.rulez.facts.Fact
+import kotlin.jvm.JvmInline
 
 /**
  * A set of [Fact]s
  *
  * @param value a bit vector of [Fact]s, generated via the associated [toVector] methods
  */
-public inline class FactVector internal constructor(internal val value: UInt) {
+@JvmInline
+public value class FactVector internal constructor(internal val value: UInt) {
     override fun toString(): String = value.toString(2)
 
     /**

@@ -17,11 +17,14 @@
 
 package org.bubenheimer.rulez.facts
 
+import kotlin.jvm.JvmInline
+
 /**
  * A [Fact] bit mask for representation in [org.bubenheimer.rulez.rules.FactVector] and
  * [org.bubenheimer.rulez.state.State]
  */
-public inline class FactMask internal constructor(internal val value: UInt) {
+@JvmInline
+public value class FactMask internal constructor(internal val value: UInt) {
     override fun toString(): String = value.toString(2)
 }
 

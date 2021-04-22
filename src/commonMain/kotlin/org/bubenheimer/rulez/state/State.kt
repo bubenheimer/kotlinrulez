@@ -20,11 +20,13 @@ package org.bubenheimer.rulez.state
 import org.bubenheimer.rulez.facts.Fact
 import org.bubenheimer.rulez.rules.FactVector
 import org.bubenheimer.rulez.rules.toVector
+import kotlin.jvm.JvmInline
 
 /**
  * Rule engine fact state
  */
-public inline class State constructor(public val value: UInt) {
+@JvmInline
+public value class State constructor(public val value: UInt) {
     /**
      * Convenience method to format the fact state of the rule engine or the rule base
      * evaluation state as a string in a standard manner (a reversed bit vector string).

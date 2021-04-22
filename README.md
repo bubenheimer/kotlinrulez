@@ -15,12 +15,6 @@ Regarding the original Java Rulez engine, please see the
 [blog entry](http://android.bubenheimer.com/2016/02/android-rulez-efficient-rule-engine-for.html)
 for more information including a presentation from DevFest MN 2016.
 
-The library uses inline classes and unsigned types at its core, so these experimental Kotlin
-features need to be enabled for library consumers as well. The library can be built against
-Kotlin 1.4.0 and Coroutines 1.3.9, as well as Kotlin 1.3.72 and Coroutines 1.3.8, but it does not
-currently seem possible to consume either library configuration in a project with the other
-configuration.
-
 License
 -------
 

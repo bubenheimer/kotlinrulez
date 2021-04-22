@@ -16,7 +16,7 @@
  */
 
 buildscript {
-    ext.kotlin_version = '1.4.32'
+    ext.kotlin_version = '1.5.0-RC'
 
     repositories {
         gradlePluginPortal()
@@ -36,7 +36,7 @@ apply plugin: "kotlinx-atomicfu"
 
 repositories {
     mavenLocal()
-    jcenter()
+    mavenCentral()
 }
 
 kotlin {
@@ -44,8 +44,6 @@ kotlin {
         all {
             languageSettings {
                 progressiveMode = true
-                enableLanguageFeature('InlineClasses')
-                useExperimentalAnnotation("kotlin.ExperimentalUnsignedTypes")
                 useExperimentalAnnotation("kotlinx.coroutines.ExperimentalCoroutinesApi")
             }
         }
@@ -79,7 +77,6 @@ kotlin {
             all {
                 kotlinOptions {
                     jvmTarget = "1.8"
-                    useIR = true
                     freeCompilerArgs = [
                             "-Xjvm-default=all"
                     ]
