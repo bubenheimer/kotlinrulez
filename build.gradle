@@ -16,14 +16,14 @@
  */
 
 buildscript {
-    ext.kotlin_version = '1.5.30'
+    ext.kotlin_version = '1.6.10'
 
     repositories {
         gradlePluginPortal()
     }
 
     dependencies {
-        classpath "org.jetbrains.kotlinx:atomicfu-gradle-plugin:0.16.3"
+        classpath "org.jetbrains.kotlinx:atomicfu-gradle-plugin:0.17.0"
     }
 }
 
@@ -50,7 +50,7 @@ kotlin {
 
         commonMain {
             dependencies {
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.1")
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0")
                 implementation("org.bubenheimer:kotlinutil:1.0-SNAPSHOT")
             }
         }
